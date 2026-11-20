@@ -1,6 +1,7 @@
 import { MongoClient, type Db } from "mongodb";
 
 let database: Db;
+let mongoClient: MongoClient;
 
 export const connectToDatabase = async (): Promise<void> => {
   const MONGODB_URI = process.env.MONGODB_URI;
@@ -14,9 +15,12 @@ export const connectToDatabase = async (): Promise<void> => {
 
   await client.connect();
 
-  database = client.db(DB_NAME);
+  const db = client.db(DB_NAME);
 
-  await database.command({ ping: 1 });
+  await db.command({ ping: 1 });
+
+  mongoClient = client;
+  database = db;
 
   console.log("MongoDB Connected Successfully!");
 };
@@ -27,4 +31,12 @@ export const getDatabase = (): Db => {
   }
 
   return database;
+};
+
+export const getMongoClient = (): MongoClient => {
+  if (!mongoClient) {
+    throw new Error("MongoDB client is not connected");
+  }
+
+  return mongoClient;
 };

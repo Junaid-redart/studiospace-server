@@ -67,6 +67,38 @@ const createBookingRoutes = (
           message: "Invalid booking date.",
         });
       }
+      // Get today's date in Bangladesh time
+      const bangladeshToday = new Intl.DateTimeFormat("en-CA", {
+        timeZone: "Asia/Dhaka",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+      }).format(new Date());
+
+      // Prevent past-date bookings
+      if (bookingDate < bangladeshToday) {
+        return res.status(400).json({
+          success: false,
+          message: "You cannot book a studio for a past date.",
+        });
+      }
+
+      // Prevent booking past time slots for today
+      if (bookingDate === bangladeshToday) {
+        const nowInBangladesh = new Intl.DateTimeFormat("en-GB", {
+          timeZone: "Asia/Dhaka",
+          hour: "2-digit",
+          minute: "2-digit",
+          hourCycle: "h23",
+        }).format(new Date());
+
+        if (startTime <= nowInBangladesh) {
+          return res.status(400).json({
+            success: false,
+            message: "Please select a future start time.",
+          });
+        }
+      }
 
       // 4. Validate time
       const timePattern = /^([01]\d|2[0-3]):[0-5]\d$/;

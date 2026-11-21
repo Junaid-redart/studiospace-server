@@ -128,6 +128,33 @@ const createStudioRoutes = (auth: ReturnType<typeof createAuth>) => {
     }
   });
 
+  // GET Featured Studios (latest 6)
+  router.get("/featured", async (req, res) => {
+    try {
+      const db = getDatabase();
+
+      const studios = await db
+        .collection<Studio>("studios")
+        .find({})
+        .sort({ createdAt: -1 })
+        .limit(6)
+        .toArray();
+
+      return res.status(200).json({
+        success: true,
+        message: "Featured studios retrieved successfully.",
+        data: studios,
+      });
+    } catch (error) {
+      console.error("Get Featured Studios Error:", error);
+
+      return res.status(500).json({
+        success: false,
+        message: "Failed to retrieve featured studios.",
+      });
+    }
+  });
+
   // GET My Studio Listings
   router.get("/my-listings", async (req, res) => {
     try {

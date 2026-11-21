@@ -3,6 +3,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import dns from "node:dns";
 import createBookingRoutes from "./routes/booking.routes.js";
+import createUploadRoutes from "./routes/upload.routes.js";
 
 import { toNodeHandler } from "better-auth/node";
 
@@ -52,6 +53,9 @@ const startServer = async () => {
     app.use("/api/studios", studioRoutes(auth));
     // Booking Routes
     app.use("/api/bookings", createBookingRoutes(auth));
+
+    // Image Upload Routes
+    app.use("/api/upload", createUploadRoutes(auth));
 
     // Test API
     app.get("/", (req, res) => {

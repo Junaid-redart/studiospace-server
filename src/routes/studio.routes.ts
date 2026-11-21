@@ -70,6 +70,7 @@ const createStudioRoutes = (auth: ReturnType<typeof createAuth>) => {
         maxCapacity,
         location,
         imageUrl,
+        images,
         amenities,
         overview,
       } = req.body;
@@ -86,6 +87,7 @@ const createStudioRoutes = (auth: ReturnType<typeof createAuth>) => {
 
         location: location.trim(),
         imageUrl: imageUrl.trim(),
+        images: images?.map((url: string) => url.trim()) ?? [imageUrl.trim()],
 
         amenities: amenities.map((amenity: string) =>
           amenity.trim()
@@ -294,6 +296,7 @@ const createStudioRoutes = (auth: ReturnType<typeof createAuth>) => {
         maxCapacity,
         location,
         imageUrl,
+        images,
         amenities,
         overview,
       } = req.body;
@@ -308,6 +311,9 @@ const createStudioRoutes = (auth: ReturnType<typeof createAuth>) => {
 
         location: location.trim(),
         imageUrl: imageUrl.trim(),
+        ...(images !== undefined && {
+          images: images.map((url: string) => url.trim()),
+        }),
 
         amenities: amenities.map((amenity: string) =>
           amenity.trim()

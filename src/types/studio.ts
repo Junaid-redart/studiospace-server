@@ -6,6 +6,7 @@ export interface Studio {
   maxCapacity: number;
   location: string;
   imageUrl: string;
+  images?: string[];
   amenities: string[];
   overview: string;
 

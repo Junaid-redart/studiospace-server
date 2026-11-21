@@ -25,6 +25,24 @@ export const validateStudio = (data: unknown): string[] => {
     }
   }
 
+  // Optional studio gallery images
+  // Existing studios can continue using only imageUrl.
+  if (studio.images !== undefined) {
+    if (
+      !Array.isArray(studio.images) ||
+      studio.images.length > 10 ||
+      studio.images.some(
+        (image) =>
+          typeof image !== "string" ||
+          image.trim() === ""
+      )
+    ) {
+      errors.push(
+        "Images must be an array of up to 10 non-empty image URLs"
+      );
+    }
+  }
+
   // Hourly rate
   if (
     typeof studio.hourlyRate !== "number" ||

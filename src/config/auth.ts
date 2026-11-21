@@ -1,3 +1,4 @@
+
 import { betterAuth } from "better-auth";
 import { mongodbAdapter } from "@better-auth/mongo-adapter";
 import type { Db, MongoClient } from "mongodb";
@@ -28,5 +29,14 @@ export const createAuth = (db: Db, client: MongoClient) => {
     trustedOrigins: [
       "http://localhost:3000",
     ],
+
+    // JWT-formatted session cache stored in an HTTPOnly cookie
+    session: {
+      cookieCache: {
+        enabled: true,
+        maxAge: 5 * 60,
+        strategy: "jwt",
+      },
+    },
   });
 };

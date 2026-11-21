@@ -15,10 +15,38 @@ const createStudioRoutes = (auth: ReturnType<typeof createAuth>) => {
     try {
       const db = getDatabase();
 
+
       const studios = await db
         .collection<Studio>("studios")
-        .find({})
+        .aggregate([
+          {
+            $lookup: {
+              from: "reviews",
+              localField: "_id",
+              foreignField: "studioId",
+              as: "studioReviews",
+            },
+          },
+          {
+            $addFields: {
+              totalReviews: { $size: "$studioReviews" },
+              averageRating: {
+                $cond: [
+                  { $gt: [{ $size: "$studioReviews" }, 0] },
+                  { $round: [{ $avg: "$studioReviews.rating" }, 1] },
+                  0,
+                ],
+              },
+            },
+          },
+          {
+            $project: {
+              studioReviews: 0,
+            },
+          },
+        ])
         .toArray();
+
 
       res.status(200).json({
         success: true,
@@ -135,12 +163,40 @@ const createStudioRoutes = (auth: ReturnType<typeof createAuth>) => {
     try {
       const db = getDatabase();
 
+
       const studios = await db
         .collection<Studio>("studios")
-        .find({})
-        .sort({ createdAt: -1 })
-        .limit(6)
+        .aggregate([
+          { $sort: { createdAt: -1 } },
+          { $limit: 6 },
+          {
+            $lookup: {
+              from: "reviews",
+              localField: "_id",
+              foreignField: "studioId",
+              as: "studioReviews",
+            },
+          },
+          {
+            $addFields: {
+              totalReviews: { $size: "$studioReviews" },
+              averageRating: {
+                $cond: [
+                  { $gt: [{ $size: "$studioReviews" }, 0] },
+                  { $round: [{ $avg: "$studioReviews.rating" }, 1] },
+                  0,
+                ],
+              },
+            },
+          },
+          {
+            $project: {
+              studioReviews: 0,
+            },
+          },
+        ])
         .toArray();
+
 
       return res.status(200).json({
         success: true,

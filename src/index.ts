@@ -4,6 +4,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import dns from "node:dns";
 
+
 import { toNodeHandler } from "better-auth/node";
 
 import {
@@ -16,6 +17,7 @@ import { createAuth } from "./config/auth.js";
 import studioRoutes from "./routes/studio.routes.js";
 import createBookingRoutes from "./routes/booking.routes.js";
 import createUploadRoutes from "./routes/upload.routes.js";
+import createReviewRoutes from "./routes/review.routes.js";
 
 dotenv.config();
 
@@ -75,6 +77,11 @@ function initializeBackend(): Promise<void> {
       apiApp.use(
         "/api/upload",
         createUploadRoutes(auth)
+      );
+      // Studio Reviews routes
+      apiApp.use(
+        "/api/reviews",
+        createReviewRoutes(auth)
       );
 
       // Server health check

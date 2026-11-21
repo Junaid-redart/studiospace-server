@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import dns from "node:dns";
+import createBookingRoutes from "./routes/booking.routes.js";
 
 import { toNodeHandler } from "better-auth/node";
 
@@ -37,18 +38,20 @@ const startServer = async () => {
     // Connect MongoDB
     await connectToDatabase();
 
-   // Initialize Better Auth
-const auth = createAuth(getDatabase(), getMongoClient());
+    // Initialize Better Auth
+    const auth = createAuth(getDatabase(), getMongoClient());
 
 
 
-app.all("/api/auth/*splat", toNodeHandler(auth));
+    app.all("/api/auth/*splat", toNodeHandler(auth));
 
-// JSON Middleware
-app.use(express.json());
+    // JSON Middleware
+    app.use(express.json());
 
     // Studio Routes
-    app.use("/api/studios", studioRoutes);
+    app.use("/api/studios", studioRoutes(auth));
+    // Booking Routes
+    app.use("/api/bookings", createBookingRoutes(auth));
 
     // Test API
     app.get("/", (req, res) => {

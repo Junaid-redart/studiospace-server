@@ -4,6 +4,15 @@ import { mongodbAdapter } from "@better-auth/mongo-adapter";
 import type { Db, MongoClient } from "mongodb";
 
 export const createAuth = (db: Db, client: MongoClient) => {
+  const isProduction = process.env.NODE_ENV === "production";
+
+  const frontendUrl = process.env.FRONTEND_URL?.replace(/\/$/, "");
+
+  const trustedOrigins = [
+    ...(isProduction ? [] : ["http://localhost:3000"]),
+    ...(frontendUrl ? [frontendUrl] : []),
+  ];
+
   return betterAuth({
     database: mongodbAdapter(db, {
       client,
@@ -22,15 +31,25 @@ export const createAuth = (db: Db, client: MongoClient) => {
       },
     },
 
+    // Local: http://localhost:5000
+    // Production: https://your-backend.vercel.app
     baseURL: process.env.BETTER_AUTH_URL,
 
     secret: process.env.BETTER_AUTH_SECRET,
 
-    trustedOrigins: [
-      "http://localhost:3000",
-    ],
+    trustedOrigins,
 
-    // JWT-formatted session cache stored in an HTTPOnly cookie
+    // Production requires secure cookies.
+    advanced: {
+      defaultCookieAttributes: {
+        httpOnly: true,
+        secure: isProduction,
+        sameSite: isProduction ? "none" : "lax",
+        path: "/",
+      },
+    },
+
+    // JWT-formatted HTTPOnly session cache
     session: {
       cookieCache: {
         enabled: true,

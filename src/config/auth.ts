@@ -31,6 +31,14 @@ export const createAuth = (db: Db, client: MongoClient) => {
       },
     },
 
+    account: {
+      accountLinking: {
+        enabled: true,
+        trustedProviders: ["google"],
+      },
+    },
+
+
     // Local: http://localhost:5000
     // Production: https://your-backend.vercel.app
     baseURL: process.env.BETTER_AUTH_URL,
